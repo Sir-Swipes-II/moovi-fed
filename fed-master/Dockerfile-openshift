@@ -1,0 +1,32 @@
+# Step one: build scapresults
+FROM registry.access.redhat.com/ubi9/go-toolset as builder
+COPY go.mod go.mod
+COPY go.sum go.sum
+COPY *.go ./
+COPY ./cmd/fedtest ./cmd/fedtest
+COPY ./cmd/server ./cmd/server
+COPY ./client ./client
+COPY ./data ./data
+COPY ./pkg ./pkg
+COPY ./webui ./webui
+COPY makefile makefile
+RUN make build
+
+FROM registry.access.redhat.com/ubi9/ubi-minimal
+
+ARG VERSION=unknown
+LABEL maintainer="Moov <oss@moov.io>"
+LABEL name="fed"
+LABEL version=$VERSION
+
+COPY --from=builder /opt/app-root/src/bin/server /bin/server
+
+COPY data/*.txt /data/fed/
+
+ENV FEDACH_DATA_PATH=/data/fed/FedACHdir.txt
+ENV FEDWIRE_DATA_PATH=/data/fed/fpddir.txt
+
+EXPOSE 8086
+EXPOSE 9096
+
+ENTRYPOINT ["/bin/server"]
