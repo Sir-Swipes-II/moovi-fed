@@ -17,8 +17,6 @@ import (
 	"strings"
 	"syscall"
 	"time"
-	"log"
-	"net/http"
 
 	"github.com/moov-io/base/admin"
 	moovhttp "github.com/moov-io/base/http"
