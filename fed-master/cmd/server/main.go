@@ -38,6 +38,12 @@ var (
 func main() {
 	flag.Parse()
 
+	port := os.Getenv("PORT")
+	if port == "" {
+    	port = "8080" // fallback for local dev
+	}
+	*httpAddr = ":" + port
+
 	var logger log.Logger
 	if v := os.Getenv("LOG_FORMAT"); v != "" {
 		*flagLogFormat = v
@@ -51,18 +57,6 @@ func main() {
 
 	// Channel for errors
 	errs := make(chan error)
-
-	// port := os.Getenv("PORT")
-	// if port == "" {
-	// 	port = "8080" // default for local dev
-	// }
-
-	// log.Println("Server starting on port:", port)
-
-	// err := http.ListenAndServe(":"+port, nil)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	go func() {
 		c := make(chan os.Signal, 1)
